@@ -9,3 +9,17 @@ Ambos programas cumplen con las mismas características:
 - Firmar archivos (archivo individual o todos los archivos de una carpeta dada).
 - Verificar la firma de un archivo.
 - Exportar el certificado de FIRMA de un DNI.
+
+Para ejecutar los programas es necesario tener descargado openSC, normalmente en la siguiente dirección:
+"C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll"
+
+Podemos obtener la descarga en el siguiente enlace:
+https://github.com/OpenSC/OpenSC/releases/tag/0.26.1
+
+A su vez, es necesario instalar librerías de python que no vienen instaladas de forma predeterminada:
+tkinter, getpass, smartcard, cryptography, PyKCS11.
+
+Por último, es necesario un lector de tarjetas inteligente USB y DNIe.
+Limitaciones:
+Durante el desarrollo del programa hemos detectado una limitación a la hora de verificar los documentos firmados.
+Cuando renuevas los certificados del DNI, los antiguos no desaparecen y permanecen en memoria. Por ello, existe la posibilidad que al firmar un archivo, se use la clave privada NUEVA, pero a la hora de verificarlo se use la clave pública ANTIGUA, de forma que no se verifica correctamente.
