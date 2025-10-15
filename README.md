@@ -19,7 +19,10 @@ https://github.com/OpenSC/OpenSC/releases/tag/0.26.1
 A su vez, es necesario instalar librerías de python que no vienen instaladas de forma predeterminada:
 tkinter, getpass, smartcard, cryptography, PyKCS11.
 
+En el caso de querer ejecutar el programa con la interfaz gráfica, es necesario tener descargados y en el mismo directorio que el progama principal las imágenes de fondo (batalla.png, oak.png).
+
 Por último, es necesario un lector de tarjetas inteligente USB y DNIe.
-Limitaciones:
+
+*Limitaciones:*
 Durante el desarrollo del programa hemos detectado una limitación a la hora de verificar los documentos firmados.
 Cuando renuevas los certificados del DNI, los antiguos no desaparecen y permanecen en memoria. Por ello, existe la posibilidad que al firmar un archivo, se use la clave privada NUEVA, pero a la hora de verificarlo se use la clave pública ANTIGUA, de forma que no se verifica correctamente.
