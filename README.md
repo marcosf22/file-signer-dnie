@@ -10,7 +10,7 @@ Ambos programas cumplen con las mismas características:
 - Verificar la firma de un archivo.
 - Exportar el certificado de FIRMA de un DNI.
 
-Para ejecutar los programas es necesario tener descargado openSC, normalmente en la siguiente dirección:
+Para ejecutar los programas es necesario tener descargado openSC, normalmente en la siguiente ruta:
 "C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll"
 
 Podemos obtener la descarga en el siguiente enlace:
