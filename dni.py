@@ -40,7 +40,10 @@ def iniciar_sesion():
             print("Tarjeta detectada en la ranura: ", slot)
 
     # Introducimos el PIN e iniciamos sesión.
-    password = getpass.getpass("\nIntroduce el PIN del DNIe: ")
+    password = None
+    while not password:
+        password = getpass.getpass("\nIntroduce el PIN del DNIe: ")
+
     sesion = pkcs11.openSession(slot)
     sesion.login(password)
     print('\nInicio correcto')
