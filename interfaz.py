@@ -1,4 +1,4 @@
-import base64, os, textwrap, threading, PyKCS11
+import base64, os, textwrap, threading, PyKCS11, sys, subprocess, socket, platform
 
 from smartcard.System import readers
 from cryptography import x509
@@ -197,7 +197,8 @@ def firmar_documento():
             root.after(2000, pantalla_botones)
 
         except Exception as e:
-            root.after(2000, pantalla_botones)    
+            mostrar_mensaje("Ha habido un error.", 1, 25)
+            root.after(5000, pantalla_botones)    
 
 def verificar_firma():
     """
@@ -305,41 +306,60 @@ def pantalla_bienvenida():
 
     threading.Thread(target=escribir_texto, daemon=True).start()
 
-    root.after(10000, lambda: lector(False))
+    root.after(3000, lambda: lector(False))
 
 def pantalla_pin(slot):
     """Muestra la interfaz para introducir el PIN para acceder al DNIe."""
     limpiar_contenido()
+    mostrar_mensaje("Presiona el botón PIN y accede a la ventana de comandos.",2,25)
 
-    mostrar_mensaje("Introduce el pin del DNIe.",2,25)
+    HOST = "127.0.0.1"
+    def pedir_pin(callback):
+        s = socket.socket(); s.bind((HOST, 0)); s.listen(1)
+        port = s.getsockname()[1]
+        code = f"import socket,getpass;pin=getpass.getpass('Introduzca el PIN: ');s=socket.socket();s.connect(('{HOST}',{port}));s.send(pin.encode());s.close()"
+        if platform.system() == "Windows":
+            subprocess.Popen([sys.executable, "-c", code], creationflags=0x00000010)
+        elif platform.system() == "Darwin":
+            subprocess.Popen(["osascript", "-e", f'tell app "Terminal" to do script "{sys.executable} -c \'{code}\'"'])
+        else:  # Linux / Unix
+            subprocess.Popen(["x-terminal-emulator", "-e", sys.executable, "-c", code])
+        conn,_ = s.accept(); data = conn.recv(128); conn.close(); s.close()
+        callback(data)
 
-    pin_frame = tk.Frame(root, bg=None, bd=8)
-    pin_frame.place(relx=0.04, rely=0.62, relwidth=0.3, relheight=0.09)
+    boton_frame = tk.Frame(root, bg="#7A0000", bd=8, relief="ridge")
+    boton_frame.place(relx=0.03, rely=0.61, relwidth=0.33, relheight=0.11)
+    boton = tk.Button(boton_frame, text="PIN", command=lambda: pedir_pin(confirmar_pin), bg="#7A0000", fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))  
+    boton.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
-    pin_var = tk.StringVar()
-    pin_entry = ttk.Entry(pin_frame, textvariable=pin_var, show="*", font=("Arial", int(18*root.winfo_width()/950)), width=int(15*root.winfo_width()/950))
-    pin_entry.pack(pady=5)
-    pin_entry.focus()
+    # Esta forma no era tan segura 
+    
+    # pin_frame = tk.Frame(root, bg=None, bd=8)
+    # pin_frame.place(relx=0.04, rely=0.62, relwidth=0.3, relheight=0.09)
+
+    # pin_var = tk.StringVar()
+    # pin_entry = ttk.Entry(pin_frame, textvariable=pin_var, show="*", font=("Arial", int(18*root.winfo_width()/950)), width=int(15*root.winfo_width()/950))
+    # pin_entry.pack(pady=5)
+    # pin_entry.focus()
 
     # Función que confirmar que haya un pin introducido.
-    def confirmar_pin():
-        pin = pin_var.get().strip()
+    def confirmar_pin(pin):
         if not pin:
             root.after(0, mostrar_mensaje("Atención. Debes introducir tu PIN.", 2, 25))
             return
         iniciar_sesion(slot, pin)
 
-    # Botón de ACEPTAR.
-    boton_frame = tk.Frame(root, bg="#7A0000", bd=8, relief="ridge")
-    boton_frame.place(relx=0.65, rely=0.5, relwidth=0.3, relheight=0.09)
-    aceptar = tk.Button(boton_frame, text="Aceptar", bg="#7A0000", command=confirmar_pin, fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))
-    aceptar.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
+    # # Botón de ACEPTAR.
+    # boton_frame = tk.Frame(root, bg="#7A0000", bd=8, relief="ridge")
+    # boton_frame.place(relx=0.65, rely=0.5, relwidth=0.3, relheight=0.09)
+    # aceptar = tk.Button(boton_frame, text="Aceptar", bg="#7A0000", command=confirmar_pin, fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))
+    # aceptar.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
-    # Botón de CANCELAR.
-    boton_frame2 = tk.Frame(root, bg="#00187A", bd=8, relief="ridge")
-    boton_frame2.place(relx=0.65, rely=0.6, relwidth=0.3, relheight=0.09)
-    cancelar = tk.Button(boton_frame2, text="Cancelar", bg="#00187A", command=salir, fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))
-    cancelar.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
+    # # Botón de CANCELAR.
+    # boton_frame2 = tk.Frame(root, bg="#00187A", bd=8, relief="ridge")
+    # boton_frame2.place(relx=0.65, rely=0.6, relwidth=0.3, relheight=0.09)
+    # cancelar = tk.Button(boton_frame2, text="Cancelar", bg="#00187A", command=salir, fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))
+    # cancelar.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
 def cambiar_fondo(ruta_imagen):
     """Función que permite cambiar el fondo de la interfaz por otra imagen."""
