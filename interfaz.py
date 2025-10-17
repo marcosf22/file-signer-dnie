@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
 
+# Esta es la ruta donde está guardada la librería, en MAC y linux puede cambiar.
 pkcs11 = PyKCS11.PyKCS11Lib()
 lib = pkcs11.load("C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll")
 
@@ -19,7 +20,7 @@ def lector(leido1):
     Comprueba cada 1 segundo si hay un lector disponible.
     La variable leido1 sirve para mostrar por pantalla una unica vez el mensaje.
     """
-
+    
     cambiar_fondo("oak.png")
     lectores = readers()
     if lectores:
@@ -80,10 +81,6 @@ def cerrar_sesion():
             sesion.closeSession()
         except:
             pass
-    root.destroy() # Cerramos el programa.
-
-def salir():
-    """Cierra el programa"""
     root.destroy()
 
 def exportar_certificado():
@@ -233,6 +230,7 @@ def verificar_firma():
             signature = f.read()
     except Exception as e:
         pass
+    
     # Verificamos la firma
     try: 
         clave_publica = certificado.public_key()
@@ -311,9 +309,10 @@ def pantalla_bienvenida():
 def pantalla_pin(slot):
     """Muestra la interfaz para introducir el PIN para acceder al DNIe."""
     limpiar_contenido()
-    mostrar_mensaje("Presiona el botón PIN y accede a la ventana de comandos.",2,25)
+    mostrar_mensaje("Presiona el botón 'PIN' para acceder a la terminal.",2,25)
 
-    HOST = "127.0.0.1"
+    # Abrimos una terminal para acceder al PIN de forma segura.
+    HOST = "localhost"
     def pedir_pin(callback):
         s = socket.socket(); s.bind((HOST, 0)); s.listen(1)
         port = s.getsockname()[1]
@@ -332,7 +331,7 @@ def pantalla_pin(slot):
     boton = tk.Button(boton_frame, text="PIN", command=lambda: pedir_pin(confirmar_pin), bg="#7A0000", fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))  
     boton.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
-    # Esta forma no era tan segura 
+    # Esta forma no era tan segura y por eso está comentada.
     
     # pin_frame = tk.Frame(root, bg=None, bd=8)
     # pin_frame.place(relx=0.04, rely=0.62, relwidth=0.3, relheight=0.09)
@@ -358,7 +357,7 @@ def pantalla_pin(slot):
     # # Botón de CANCELAR.
     # boton_frame2 = tk.Frame(root, bg="#00187A", bd=8, relief="ridge")
     # boton_frame2.place(relx=0.65, rely=0.6, relwidth=0.3, relheight=0.09)
-    # cancelar = tk.Button(boton_frame2, text="Cancelar", bg="#00187A", command=salir, fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))
+    # cancelar = tk.Button(boton_frame2, text="Cancelar", bg="#00187A", command=cerrar_sesion, fg="#FFFFFF", font=("Fixedsys", int(25*root.winfo_width()/950)))
     # cancelar.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
 def cambiar_fondo(ruta_imagen):
@@ -427,7 +426,7 @@ def pantalla_botones():
     # Botón de SALIR y CERRAR SESIÓN.
     boton_frame4 = tk.Frame(root, bg="#EDED00", bd=8, relief="ridge")
     boton_frame4.place(relx=0.75, rely=0.89, relwidth=0.24, relheight=0.1)
-    aceptar = tk.Button(boton_frame4, text="Salir", bg="#EDED00", command=salir, fg="#C2C2C2", font=("Fixedsys", int(25*root.winfo_width()/950)))
+    aceptar = tk.Button(boton_frame4, text="Salir", bg="#EDED00", command=cerrar_sesion, fg="#C2C2C2", font=("Fixedsys", int(25*root.winfo_width()/950)))
     aceptar.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
     mostrar_mensaje("Elige una opción:", 1, 25)

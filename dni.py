@@ -7,6 +7,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
+# Esta es la ruta donde está guardada la librería, en MAC y linux puede cambiar.
 pkcs11 = PyKCS11.PyKCS11Lib()
 lib = pkcs11.load("C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll")
 
@@ -209,6 +210,7 @@ def verificar_firma(sesion):
     time.sleep(3)
 
 if __name__ == "__main__":
+    """Programa principal"""
     try:
         print("\nBienvenido al sistema de firma\n")
         sesion = iniciar_sesion()
